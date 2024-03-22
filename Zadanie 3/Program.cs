@@ -7,6 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 using System.Drawing;
 
 using Shaders;
+using Models;
 
 namespace PMLabs
 {
@@ -52,6 +53,7 @@ namespace PMLabs
         {
             GL.ClearColor(0, 0, 0, 1);
             shader = new ShaderProgram("v_shader.glsl", "f_shader.glsl");
+            GL.Enable(EnableCap.DepthTest);
             Glfw.SetKeyCallback(window, kc);
         }
 
@@ -74,7 +76,16 @@ namespace PMLabs
             mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) * mat4.Rotate(angle_x, new vec3(1, 0, 0));
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
-
+            float[] vertices = MyCube.vertices;
+            float[] colors = MyCube.colors;
+            int vertexCount = MyCube.vertexCount;
+            GL.EnableVertexAttribArray(shader.A("vertex"));
+            GL.EnableVertexAttribArray(shader.A("color"));
+            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, vertices);
+            GL.VertexAttribPointer(shader.A("color"), 4, VertexAttribPointerType.Float, false, 0, colors);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertexCount);
+            GL.DisableVertexAttribArray(shader.A("vertex"));
+            GL.DisableVertexAttribArray(shader.A("color"));
 
             Glfw.SwapBuffers(window);
         }
@@ -83,7 +94,7 @@ namespace PMLabs
         {
             Glfw.Init();
 
-            Window window = Glfw.CreateWindow(500, 500, "Programowanie multimedialne", GLFW.Monitor.None, Window.None);
+            Window window = Glfw.CreateWindow(900, 900, "Programowanie multimedialne", GLFW.Monitor.None, Window.None);
 
             Glfw.MakeContextCurrent(window);
             Glfw.SwapInterval(1);
